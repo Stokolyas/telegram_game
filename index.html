@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер игра</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .game-container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .game-container button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .click-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .upgrade-btn {
+            background-color: #008CBA;
+            color: white;
+        }
+        .click-btn:disabled,
+        .upgrade-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Кликер игра</h1>
+        <p>Очки: <span id="score">0</span></p>
+        <button class="click-btn" onclick="addPoints()">Кликни меня</button>
+        <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
+        <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let pointsPerClick = 1;
+        let upgradeCost = 10;
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('upgradeCost').textContent = upgradeCost;
+        }
+
+        function addPoints() {
+            score += pointsPerClick;
+            updateDisplay();
+        }
+
+        function buyUpgrade() {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                pointsPerClick++;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                updateDisplay();
+            } else {
+                alert("Недостаточно очков для покупки улучшения!");
+            }
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
