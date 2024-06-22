@@ -52,8 +52,9 @@
         <button class="click-btn" onclick="addPoints()">Кликни меня</button>
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
+        <button onclick="TelegramGameProxy.shareScore()">Share score</button>
     </div>
-
+    <script src="https://telegram.org/js/games.js"></script>
     <script>
         let score = 0;
         let pointsPerClick = 1;
