@@ -15,20 +15,29 @@
             background-color: #f0f0f0;
             margin: 0;
         }
-        .game-container {
+        .container {
             text-align: center;
             background: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
         }
-        .game-container button {
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu-container button {
             margin: 10px;
             padding: 10px 20px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+        .game-container {
+            display: none;
         }
         .upgrade-btn {
             background-color: #008CBA;
@@ -72,7 +81,15 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="game-container">
+    <div id="menu" class="container menu-container">
+        <h1>Меню</h1>
+        <button onclick="startNewGame()">Начать новую игру</button>
+        <button onclick="continueGame()">Продолжить игру</button>
+        <button onclick="openShop()">Магазин</button>
+        <button onclick="openTasks()">Задания</button>
+    </div>
+
+    <div id="game" class="container game-container">
         <h1>Кликер игра</h1>
         <p>Очки: <span id="score">0</span></p>
         <p>Уровень: <span id="level">1</span></p>
@@ -87,6 +104,19 @@
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
         <button class="save-btn" onclick="saveGame()">Сохранить игру</button>
         <button class="load-btn" onclick="loadGame()">Загрузить игру</button>
+        <button onclick="backToMenu()">Назад в меню</button>
+    </div>
+
+    <div id="shop" class="container">
+        <h1>Магазин</h1>
+        <p>Тут будет магазин</p>
+        <button onclick="backToMenu()">Назад в меню</button>
+    </div>
+
+    <div id="tasks" class="container">
+        <h1>Задания</h1>
+        <p>Тут будут задания</p>
+        <button onclick="backToMenu()">Назад в меню</button>
     </div>
 
     <audio id="click-sound" src="sound.mp3" preload="auto"></audio>
@@ -208,9 +238,53 @@
             }
         }
 
+        function showMenu() {
+            document.getElementById('menu').style.display = 'flex';
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('shop').style.display = 'none';
+            document.getElementById('tasks').style.display = 'none';
+        }
+
+        function startNewGame() {
+            score = 0;
+            pointsPerClick = 1;
+            upgradeCost = 10;
+            level = 1;
+            clicks = 10;
+            maxClicks = 10;
+            clickCount = 0;
+            updateDisplay();
+            showGame();
+        }
+
+        function continueGame() {
+            loadGame();
+            showGame();
+        }
+
+        function showGame() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+        }
+
+        function openShop() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('shop').style.display = 'block';
+        }
+
+        function openTasks() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('tasks').style.display = 'block';
+        }
+
+        function backToMenu() {
+            showMenu();
+        }
+
         setInterval(recoverClicks, clickRecoveryRate);
         updateDisplay();
         initTelegram(); // Инициализация Telegram при загрузке страницы
+        showMenu(); // Показываем меню при загрузке страницы
     </script>
 </body>
 </html>
