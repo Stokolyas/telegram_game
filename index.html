@@ -69,12 +69,15 @@
         let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
         let telegramId;
 
-        Telegram.WebApp.ready();
-
-        if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
-            telegramId = Telegram.WebApp.initDataUnsafe.user.id;
-        } else {
-            alert('Не удалось получить telegramId');
+        // Функция для инициализации Telegram Web App
+        function initTelegram() {
+            Telegram.WebApp.ready();
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (user) {
+                telegramId = user.id;
+            } else {
+                alert('Не удалось получить telegramId');
+            }
         }
 
         function updateDisplay() {
@@ -162,6 +165,7 @@
 
         setInterval(recoverClicks, clickRecoveryRate);
         updateDisplay();
+        initTelegram(); // Инициализация Telegram при загрузке страницы
     </script>
 </body>
 </html>
