@@ -43,7 +43,21 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #4CAF50;
+            width: 0;
+            transition: width 0.25s;
+        }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="game-container">
@@ -51,6 +65,9 @@
         <p>Очки: <span id="score">0</span></p>
         <p>Уровень: <span id="level">1</span></p>
         <p>Заряд кликов: <span id="clicks">10</span></p>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
         <button class="click-btn" onclick="addPoints()">Кликни меня</button>
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
@@ -58,8 +75,7 @@
         <button class="load-btn" onclick="loadGame()">Загрузить игру</button>
     </div>
 
-    <script type="text/javascript" src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script type="text/javascript">
+    <script>
         let score = 0;
         let pointsPerClick = 1;
         let upgradeCost = 10;
@@ -69,7 +85,6 @@
         let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
         let telegramId;
 
-        // Функция для инициализации Telegram Web App
         function initTelegram() {
             Telegram.WebApp.ready();
             const user = Telegram.WebApp.initDataUnsafe.user;
@@ -86,6 +101,10 @@
             document.getElementById('clicks').textContent = clicks;
             document.getElementById('upgradeCost').textContent = upgradeCost;
             document.querySelector('.click-btn').disabled = clicks === 0;
+
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const progressPercentage = (score / (level * 50)) * 100;
+            progressBarFill.style.width = Math.min(progressPercentage, 100) + '%';
         }
 
         function addPoints() {
