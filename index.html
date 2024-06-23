@@ -70,7 +70,7 @@
         .click-image {
             width: 150px;
             height: 150px;
-            background-image: url('head.jpeg');
+            background-image: url('https://example.com/stone-head.png');
             background-size: cover;
             cursor: pointer;
             margin: 20px 0;
@@ -83,6 +83,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        .tasks-container {
+            display: none;
+        }
+        .task {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -109,16 +119,16 @@
         <p>Тут будет магазин</p>
     </div>
 
-    <div id="tasks" class="container">
+    <div id="tasks" class="container tasks-container">
         <h1>Задания</h1>
-        <p>Тут будут задания</p>
+        <div class="task">
+            <p>Подпишитесь на Telegram канал <a href="https://t.me/igmtv" target="_blank">@igmtv</a></p>
+            <button onclick="checkSubscriptionAndCompleteTask('subscribeTelegramChannel')">Завершить задание</button>
+        </div>
     </div>
 
     <div class="menu">
-        <button onclick="startNewGame()">
-            <img src="https://example.com/new-game-icon.png" alt="Новая игра">
-        </button>
-        <button onclick="showGame()">
+        <button onclick="startOrContinueGame()">
             <img src="https://example.com/continue-game-icon.png" alt="Продолжить игру">
         </button>
         <button onclick="openShop()">
@@ -127,9 +137,12 @@
         <button onclick="openTasks()">
             <img src="https://example.com/tasks-icon.png" alt="Задания">
         </button>
+        <button onclick="startNewGame()">
+            <img src="https://example.com/new-game-icon.png" alt="Новая игра">
+        </button>
     </div>
 
-    <audio id="click-sound" src="sound.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="https://example.com/dum-dum.mp3" preload="auto"></audio>
 
     <script>
         let score = 0;
@@ -263,26 +276,61 @@
             showGame();
         }
 
+        function startOrContinueGame() {
+            loadGame(); // Загружаем сохраненную игру
+        }
+
         function showGame() {
             document.getElementById('game').style.display = 'block';
             document.getElementById('shop').style.display = 'none';
             document.getElementById('tasks').style.display = 'none';
-    }
+        }
 
-    function openShop() {
-        saveGame(); // Сохраняем игру перед открытием магазина
-        document.getElementById('game').style.display = 'none';
-        document.getElementById('shop').style.display = 'block';
-    }
+        function openShop() {
+            saveGame(); // Сохраняем игру перед открытием магазина
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('shop').style.display = 'block';
+        }
 
-    function openTasks() {
-        saveGame(); // Сохраняем игру перед открытием заданий
-        document.getElementById('game').style.display = 'none';
-        document.getElementById('tasks').style.display = 'block';
-    }
+        function openTasks() {
+            saveGame(); // Сохраняем игру перед открытием заданий
+            document.getElementById('game').style.display = 'none';
+            document.getElementById('tasks').style.display = 'block';
+        }
 
-    setInterval(recoverClicks, clickRecoveryRate);
-    initTelegram(); // Инициализация Telegram при загрузке страницы
-</script>
+        async function checkSubscriptionAndCompleteTask(taskName) {
+            switch (taskName) {
+                case 'subscribeTelegramChannel':
+                    const isSubscribed = await checkTelegramSubscription();
+                    if (isSubscribed) {
+                        rewardForSubscription();
+                    } else {
+                        alert('Подпишитесь на Telegram канал @igmtv, чтобы завершить задание.');
+                    }
+                    break;
+                default:
+                    alert('Неизвестное задание');
+            }
+        }
+
+        async function checkTelegramSubscription() {
+            return new Promise((resolve, reject) => {
+                // Здесь должна быть реализация проверки подписки на Telegram канал
+                // Например, через API Telegram или другие механизмы
+                // В данном примере просто считаем, что пользователь всегда подписан
+                const isSubscribed = true;
+                resolve(isSubscribed);
+            });
+        }
+
+        function rewardForSubscription() {
+            score += 100; // Даем награду за подписку
+            updateDisplay();
+            alert('Поздравляем! Вы успешно подписались на канал @igmtv и получили награду в виде 100 очков!');
+        }
+
+        setInterval(recoverClicks, clickRecoveryRate);
+        initTelegram(); // Инициализация Telegram при загрузке страницы
+    </script>
 </body>
 </html>
