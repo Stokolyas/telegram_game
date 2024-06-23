@@ -277,7 +277,12 @@
         }
 
         function startOrContinueGame() {
-            loadGame(); // Загружаем сохраненную игру
+            try {
+                showGame();
+            }
+            catch (error){
+                loadGame(); // Загружаем сохраненную игру
+            }
         }
 
         function showGame() {
