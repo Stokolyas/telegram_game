@@ -30,15 +30,10 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .click-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
         .upgrade-btn {
             background-color: #008CBA;
             color: white;
         }
-        .click-btn:disabled,
         .upgrade-btn:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
@@ -56,6 +51,23 @@
             width: 0;
             transition: width 0.25s;
         }
+        .click-image {
+            width: 150px;
+            height: 150px;
+            background-image: url('head.jpeg');
+            background-size: cover;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: transform 0.1s;
+        }
+        .click-image:active {
+            transform: scale(0.9);
+        }
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -68,12 +80,16 @@
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
         </div>
-        <button class="click-btn" onclick="addPoints()">Кликни меня</button>
+        <div class="centered">
+            <div class="click-image" onclick="addPoints()"></div>
+        </div>
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
         <button class="save-btn" onclick="saveGame()">Сохранить игру</button>
         <button class="load-btn" onclick="loadGame()">Загрузить игру</button>
     </div>
+
+    <audio id="click-sound" src="sound.mp3" preload="auto"></audio>
 
     <script>
         let score = 0;
@@ -84,6 +100,7 @@
         let maxClicks = 10;
         let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
         let telegramId;
+        let clickCount = 0;
 
         function initTelegram() {
             Telegram.WebApp.ready();
@@ -100,7 +117,7 @@
             document.getElementById('level').textContent = level;
             document.getElementById('clicks').textContent = clicks;
             document.getElementById('upgradeCost').textContent = upgradeCost;
-            document.querySelector('.click-btn').disabled = clicks === 0;
+            document.querySelector('.click-image').style.pointerEvents = clicks === 0 ? 'none' : 'auto';
 
             const progressBarFill = document.getElementById('progress-bar-fill');
             const progressPercentage = (score / (level * 50)) * 100;
@@ -111,11 +128,20 @@
             if (clicks > 0) {
                 score += pointsPerClick;
                 clicks--;
+                clickCount++;
+                if (clickCount % 10 === 0) {
+                    playClickSound();
+                }
                 checkLevelUp();
                 updateDisplay();
             } else {
                 alert("Недостаточно заряда кликов! Подождите, пока заряд восстановится.");
             }
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById('click-sound');
+            clickSound.play();
         }
 
         function buyUpgrade() {
