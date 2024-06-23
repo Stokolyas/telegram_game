@@ -55,31 +55,22 @@
             cursor: not-allowed;
         }
         .progress-bar {
-            width: 90%;
+            width: 100%;
             background-color: #f3f3f3;
             border-radius: 5px;
             overflow: hidden;
             margin: 20px 0;
-            display: flex;
-            align-items: center;
-            height: 40px;
         }
         .progress-bar-fill {
-            height: 100%;
+            height: 20px;
             background-color: #4CAF50;
             width: 0;
             transition: width 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
         }
         .click-image {
             width: 150px;
             height: 150px;
-            background-image: url('Moai.png');
+            background-image: url('head.jpeg');
             background-size: cover;
             cursor: pointer;
             margin: 20px 0;
@@ -186,7 +177,6 @@
             const progressBarFill = document.getElementById('progress-bar-fill');
             const progressPercentage = (score / (level * 50)) * 100;
             progressBarFill.style.width = Math.min(progressPercentage, 100) + '%';
-            progressBarFill.textContent = `${score} / ${level * 50} очков`; // Обновляем текст в статус-баре
         }
 
         function addPoints() {
@@ -229,49 +219,48 @@
             }
         }
 
-        function saveGame() {
-            const gameData = {
-                telegramId: telegramId,
-                score: score,
-                level: level,
-                clicks: clicks,
-                pointsPerClick: pointsPerClick
-            };
+        function recoverClicks() {
+            if (clicks < maxClicks) {
+                clicks++;
+                updateDisplay();
+            }
+        }
 
-            fetch(`http://localhost:5000/save`, {
+        async function saveGame() {
+            const response = await fetch('http://localhost:5000/save', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(gameData),
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Игра сохранена!');
-                } else {
-                    alert('Ошибка сохранения игры!');
-                }
-            })
-            .catch(error => {
-                alert(`Ошибка сохранения игры: ${error}`);
+                body: JSON.stringify({
+                    telegramId,
+                    score,
+                    level,
+                    clicks,
+                    pointsPerClick
+                })
             });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Игра сохранена!');
+            } else {
+                alert(`Ошибка сохранения игры: ${data.error}`);
+            }
         }
 
         async function loadGame() {
-            try {
-                const response = await fetch(`http://localhost:5000/load/${telegramId}`);
-                if (!response.ok) {
-                    throw new Error('Ошибка загрузки игры');
-                }
-                const data = await response.json();
+            const response = await fetch(`http://localhost:5000/load/${telegramId}`);
+            const data = await response.json();
+            if (response.ok) {
                 score = data.score;
                 level = data.level;
                 clicks = data.clicks;
                 pointsPerClick = data.pointsPerClick;
                 updateDisplay();
-            } catch (error) {
-                alert(`Ошибка загрузки игры: ${error.message}`);
-                startNewGame();
+                showGame();
+            } else {
+                alert(`Ошибка загрузки игры: ${data.error}`);
+                startNewGame(); // Начать новую игру, если загрузка не удалась
             }
         }
 
@@ -284,6 +273,7 @@
             maxClicks = 10;
             clickCount = 0;
             updateDisplay();
+            showGame();
         }
 
         function startOrContinueGame() {
@@ -296,32 +286,31 @@
         }
 
         function showGame() {
-            document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
             document.getElementById('game').style.display = 'block';
+            document.getElementById('shop').style.display = 'none';
+            document.getElementById('tasks').style.display = 'none';
         }
 
         function openShop() {
             saveGame(); // Сохраняем игру перед открытием магазина
-            document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
+            document.getElementById('game').style.display = 'none';
             document.getElementById('shop').style.display = 'block';
         }
 
         function openTasks() {
             saveGame(); // Сохраняем игру перед открытием заданий
-            document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
+            document.getElementById('game').style.display = 'none';
             document.getElementById('tasks').style.display = 'block';
         }
 
-        function checkSubscriptionAndCompleteTask(taskName) {
+        async function checkSubscriptionAndCompleteTask(taskName) {
             switch (taskName) {
                 case 'subscribeTelegramChannel':
-                    const isSubscribed = true; // Здесь должна быть проверка подписки на канал
+                    const isSubscribed = await checkTelegramSubscription();
                     if (isSubscribed) {
-                        score += 100;
-                        updateDisplay();
-                        alert('Вы успешно подписались на канал @igmtv и получили награду в виде 100 очков!');
+                        rewardForSubscription();
                     } else {
-                        alert('Вы не подписаны на канал @igmtv. Подпишитесь, чтобы получить награду.');
+                        alert('Подпишитесь на Telegram канал @igmtv, чтобы завершить задание.');
                     }
                     break;
                 default:
@@ -329,20 +318,23 @@
             }
         }
 
-        function updateProgressBar() {
-            const progressBarFill = document.querySelector('.progress-bar-fill');
-            const progressPercentage = (score / (level * 50)) * 100;
-            progressBarFill.style.width = Math.min(progressPercentage, 100) + '%';
-            progressBarFill.textContent = `${score} / ${level * 50} очков`;
+        async function checkTelegramSubscription() {
+            return new Promise((resolve, reject) => {
+                // Здесь должна быть реализация проверки подписки на Telegram канал
+                // Например, через API Telegram или другие механизмы
+                // В данном примере просто считаем, что пользователь всегда подписан
+                const isSubscribed = true;
+                resolve(isSubscribed);
+            });
         }
 
-        setInterval(() => {
-            if (clicks < maxClicks) {
-                clicks++;
-                updateDisplay();
-            }
-        }, clickRecoveryRate);
+        function rewardForSubscription() {
+            score += 100; // Даем награду за подписку
+            updateDisplay();
+            alert('Поздравляем! Вы успешно подписались на канал @igmtv и получили награду в виде 100 очков!');
+        }
 
+        setInterval(recoverClicks, clickRecoveryRate);
         initTelegram(); // Инициализация Telegram при загрузке страницы
     </script>
 </body>
