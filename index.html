@@ -54,8 +54,11 @@
         <button class="click-btn" onclick="addPoints()">Кликни меня</button>
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
+        <button class="save-btn" onclick="saveGame()">Сохранить игру</button>
+        <button class="load-btn" onclick="loadGame()">Загрузить игру</button>
     </div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let score = 0;
         let pointsPerClick = 1;
@@ -63,7 +66,16 @@
         let level = 1;
         let clicks = 10;
         let maxClicks = 10;
-        let clickRecoveryRate = 3000; // Время восстановления в миллисекундах
+        let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
+        let telegramId;
+
+        Telegram.WebApp.ready();
+
+        if (Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user) {
+            telegramId = Telegram.WebApp.initDataUnsafe.user.id;
+        } else {
+            alert('Не удалось получить telegramId');
+        }
 
         function updateDisplay() {
             document.getElementById('score').textContent = score;
@@ -108,6 +120,43 @@
             if (clicks < maxClicks) {
                 clicks++;
                 updateDisplay();
+            }
+        }
+
+        async function saveGame() {
+            const response = await fetch('http://localhost:5000/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    telegramId,
+                    score,
+                    level,
+                    clicks,
+                    pointsPerClick
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Игра сохранена!');
+            } else {
+                alert(`Ошибка сохранения игры: ${data.error}`);
+            }
+        }
+
+        async function loadGame() {
+            const response = await fetch(`http://localhost:5000/load/${telegramId}`);
+            const data = await response.json();
+            if (response.ok) {
+                score = data.score;
+                level = data.level;
+                clicks = data.clicks;
+                pointsPerClick = data.pointsPerClick;
+                updateDisplay();
+                alert('Игра загружена!');
+            } else {
+                alert(`Ошибка загрузки игры: ${data.error}`);
             }
         }
 
