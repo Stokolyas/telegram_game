@@ -26,10 +26,8 @@ from asyncio import Queue
 
 my_queue = Queue()
 
-async def start(update: Update, context: CustomContext) -> None:
-    await update.message.reply_html("Hello!")
-
 async def inline_query(update, context):
+    print('event')
     query_id = update.inline_query.id
     results = [
         InlineQueryResultGame(
@@ -40,25 +38,28 @@ async def inline_query(update, context):
     await context.bot.answer_inline_query(inline_query_id=query_id, results=results)
 
 async def callback_query(update, context):
+    
     query = update.callback_query
+    print('event_call',query.game_short_name, BOT_USERNAME)
     url = WEBAPP_URL
 
-    if query.game_short_name == f"BOT_USERNAME":
+    if query.game_short_name == BOT_USERNAME:
+        
         uuid = str(uuid4())
         conn = sqlite3.connect('players.db')
         cur = conn.cursor()
         cur.execute("INSERT INTO games (user_id, hash, game_name, inline_id) VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET hash=?, game_name=?, inline_id=?", (query.from_user.id, uuid, "YOUR GAME SHORT NAME", query.inline_message_id, uuid, "YOUR GAME SHORTNAME", query.inline_message_id))
         conn.commit()
         conn.close()
-
-        await context.bot.answer_callback_query(callback_query_id=query.id, url=url+uuid)
+        print(url, query.game_short_name,uuid)
+        await context.bot.answer_callback_query(callback_query_id=query.id, url=url)
     else:
         await context.bot.answer_callback_query(callback_query_id=query.id, text="This does nothing.")
 
-async def started(update: Update, context: CallbackContext) -> None:
+async def start(update: Update, context: CallbackContext) -> None:
     """Отправляет приветственное сообщение и запускает игру"""
     chat_id = update.message.chat_id
-    update.message.reply_text('Добро пожаловать в нашу игру! Нажмите кнопку ниже, чтобы начать играть.')
+    await update.message.reply_text('Добро пожаловать в нашу игру! Нажмите кнопку ниже, чтобы начать играть.')
     await context.bot.send_game(chat_id, game_short_name=BOT_USERNAME)
 
 async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
