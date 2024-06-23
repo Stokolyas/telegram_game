@@ -22,22 +22,29 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: none;
-        }
-        .menu-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .menu-container button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            width: 90%;
         }
         .game-container {
             display: none;
+        }
+        .menu {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .menu button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .menu button img {
+            width: 30px;
+            height: 30px;
         }
         .upgrade-btn {
             background-color: #008CBA;
@@ -81,14 +88,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="menu" class="container menu-container">
-        <h1>Меню</h1>
-        <button onclick="startNewGame()">Начать новую игру</button>
-        <button onclick="continueGame()">Продолжить игру</button>
-        <button onclick="openShop()">Магазин</button>
-        <button onclick="openTasks()">Задания</button>
-    </div>
-
     <div id="game" class="container game-container">
         <h1>Кликер игра</h1>
         <p>Очки: <span id="score">0</span></p>
@@ -103,20 +102,31 @@
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
         <button class="save-btn" onclick="saveGame()">Сохранить игру</button>
-        <button class="load-btn" onclick="loadGame()">Загрузить игру</button>
-        <button onclick="backToMenu()">Назад в меню</button>
     </div>
 
     <div id="shop" class="container">
         <h1>Магазин</h1>
         <p>Тут будет магазин</p>
-        <button onclick="backToMenu()">Назад в меню</button>
     </div>
 
     <div id="tasks" class="container">
         <h1>Задания</h1>
         <p>Тут будут задания</p>
-        <button onclick="backToMenu()">Назад в меню</button>
+    </div>
+
+    <div class="menu">
+        <button onclick="startNewGame()">
+            <img src="https://example.com/new-game-icon.png" alt="Новая игра">
+        </button>
+        <button onclick="showGame()">
+            <img src="https://example.com/continue-game-icon.png" alt="Продолжить игру">
+        </button>
+        <button onclick="openShop()">
+            <img src="https://example.com/shop-icon.png" alt="Магазин">
+        </button>
+        <button onclick="openTasks()">
+            <img src="https://example.com/tasks-icon.png" alt="Задания">
+        </button>
     </div>
 
     <audio id="click-sound" src="sound.mp3" preload="auto"></audio>
@@ -137,8 +147,10 @@
             const user = Telegram.WebApp.initDataUnsafe.user;
             if (user) {
                 telegramId = user.id;
+                loadGame(); // Автоматическая загрузка игры при инициализации Telegram
             } else {
                 alert('Не удалось получить telegramId');
+                startNewGame(); // Начать новую игру, если не удалось получить telegramId
             }
         }
 
@@ -232,17 +244,11 @@
                 clicks = data.clicks;
                 pointsPerClick = data.pointsPerClick;
                 updateDisplay();
-                alert('Игра загружена!');
+                showGame();
             } else {
                 alert(`Ошибка загрузки игры: ${data.error}`);
+                startNewGame(); // Начать новую игру, если загрузка не удалась
             }
-        }
-
-        function showMenu() {
-            document.getElementById('menu').style.display = 'flex';
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('shop').style.display = 'none';
-            document.getElementById('tasks').style.display = 'none';
         }
 
         function startNewGame() {
@@ -257,34 +263,26 @@
             showGame();
         }
 
-        function continueGame() {
-            loadGame();
-            showGame();
-        }
-
         function showGame() {
-            document.getElementById('menu').style.display = 'none';
             document.getElementById('game').style.display = 'block';
-        }
+            document.getElementById('shop').style.display = 'none';
+            document.getElementById('tasks').style.display = 'none';
+    }
 
-        function openShop() {
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('shop').style.display = 'block';
-        }
+    function openShop() {
+        saveGame(); // Сохраняем игру перед открытием магазина
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('shop').style.display = 'block';
+    }
 
-        function openTasks() {
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('tasks').style.display = 'block';
-        }
+    function openTasks() {
+        saveGame(); // Сохраняем игру перед открытием заданий
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('tasks').style.display = 'block';
+    }
 
-        function backToMenu() {
-            showMenu();
-        }
-
-        setInterval(recoverClicks, clickRecoveryRate);
-        updateDisplay();
-        initTelegram(); // Инициализация Telegram при загрузке страницы
-        showMenu(); // Показываем меню при загрузке страницы
-    </script>
+    setInterval(recoverClicks, clickRecoveryRate);
+    initTelegram(); // Инициализация Telegram при загрузке страницы
+</script>
 </body>
 </html>
