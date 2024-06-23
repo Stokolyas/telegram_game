@@ -49,25 +49,39 @@
     <div class="game-container">
         <h1>Кликер игра</h1>
         <p>Очки: <span id="score">0</span></p>
+        <p>Уровень: <span id="level">1</span></p>
+        <p>Заряд кликов: <span id="clicks">10</span></p>
         <button class="click-btn" onclick="addPoints()">Кликни меня</button>
         <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
         <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
-        <button onclick="TelegramGameProxy.shareScore()">Share score</button>
     </div>
-    <script src="https://telegram.org/js/games.js"></script>
+
     <script>
         let score = 0;
         let pointsPerClick = 1;
         let upgradeCost = 10;
+        let level = 1;
+        let clicks = 10;
+        let maxClicks = 10;
+        let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
 
         function updateDisplay() {
             document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('clicks').textContent = clicks;
             document.getElementById('upgradeCost').textContent = upgradeCost;
+            document.querySelector('.click-btn').disabled = clicks === 0;
         }
 
         function addPoints() {
-            score += pointsPerClick;
-            updateDisplay();
+            if (clicks > 0) {
+                score += pointsPerClick;
+                clicks--;
+                checkLevelUp();
+                updateDisplay();
+            } else {
+                alert("Недостаточно заряда кликов! Подождите, пока заряд восстановится.");
+            }
         }
 
         function buyUpgrade() {
@@ -81,6 +95,23 @@
             }
         }
 
+        function checkLevelUp() {
+            if (score >= level * 50) {
+                level++;
+                maxClicks += 5; // Увеличиваем максимальный заряд кликов при повышении уровня
+                clicks = maxClicks; // Полностью восстанавливаем заряд кликов при повышении уровня
+                alert(`Поздравляем! Вы достигли уровня ${level}!`);
+            }
+        }
+
+        function recoverClicks() {
+            if (clicks < maxClicks) {
+                clicks++;
+                updateDisplay();
+            }
+        }
+
+        setInterval(recoverClicks, clickRecoveryRate);
         updateDisplay();
     </script>
 </body>
