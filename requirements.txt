@@ -1,0 +1,4 @@
+uvicorn
+asgiref
+python-telegram-bot
+asyncio
