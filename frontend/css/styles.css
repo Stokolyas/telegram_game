@@ -40,13 +40,11 @@ body {
     height: 30px;
 }
 .progress-bar {
-    margin-left: auto;
-    margin-right: auto;
     width: 90%;
     background-color: #f3f3f3;
     border-radius: 5px;
     overflow: hidden;
-    margin: 20px 0;
+    margin: 20px auto;
     position: relative;
     height: 40px;
     display: flex;
@@ -105,4 +103,10 @@ body {
 .shop-item button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+.score-user {
+    display: none;
+}
+.level-user {
+
 }
