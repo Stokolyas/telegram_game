@@ -40,6 +40,8 @@ body {
     height: 30px;
 }
 .progress-bar {
+    margin-left: auto;
+    margin-right: auto;
     width: 90%;
     background-color: #f3f3f3;
     border-radius: 5px;
@@ -67,7 +69,7 @@ body {
 .click-image {
     width: 150px;
     height: 150px;
-    background-image: url('https://example.com/stone-head.png');
+    background-image: url('../images/heads/Moai.png');
     background-size: cover;
     cursor: pointer;
     margin: 20px 0;
