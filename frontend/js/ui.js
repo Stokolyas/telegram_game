@@ -15,6 +15,7 @@ export class UI {
         document.getElementById('score').innerText = this.game.score;
         document.getElementById('level').innerText = this.game.level;
         document.getElementById('clicks').innerText = this.game.clicks;
+        document.getElementById('maxClicks').innerText = this.game.maxClicks;
         document.getElementById('upgradeCost').innerText = this.game.upgradeCost;
 
         const progressBarFill = document.getElementById('progress-bar-fill');

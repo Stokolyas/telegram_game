@@ -4,97 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кликер игра</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none;
-            width: 90%;
-        }
-        .game-container {
-            display: none;
-        }
-        .menu {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #fff;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .menu button {
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        .menu button img {
-            width: 30px;
-            height: 30px;
-        }
-        .upgrade-btn {
-            background-color: #008CBA;
-            color: white;
-        }
-        .upgrade-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .progress-bar {
-            width: 100%;
-            background-color: #f3f3f3;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        .progress-bar-fill {
-            height: 20px;
-            background-color: #4CAF50;
-            width: 0;
-            transition: width 0.25s;
-        }
-        .click-image {
-            width: 150px;
-            height: 150px;
-            background-image: url('head.jpeg');
-            background-size: cover;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: transform 0.1s;
-        }
-        .click-image:active {
-            transform: scale(0.9);
-        }
-        .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .tasks-container {
-            display: none;
-        }
-        .task {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -102,240 +12,54 @@
         <h1>Кликер игра</h1>
         <p>Очки: <span id="score">0</span></p>
         <p>Уровень: <span id="level">1</span></p>
-        <p>Заряд кликов: <span id="clicks">10</span></p>
+        <div class="energy-bar">
+            <img src="https://example.com/energy-icon.png" alt="Энергия" class="energy-icon">
+            <span id="clicks">10</span> / <span id="maxClicks">10</span>
+        </div>
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            <div class="progress-bar-text" id="progress-bar-text"></div>
         </div>
         <div class="centered">
-            <div class="click-image" onclick="addPoints()"></div>
+            <div class="click-image" onclick="game.addPoints()"></div>
         </div>
-        <p>Улучшения (Увеличивает очки за клик): <span id="upgradeCost">10</span> очков</p>
-        <button class="upgrade-btn" onclick="buyUpgrade()">Купить улучшение</button>
-        <button class="save-btn" onclick="saveGame()">Сохранить игру</button>
+        <button class="save-btn" onclick="game.saveGame()">Сохранить игру</button>
     </div>
 
-    <div id="shop" class="container">
+    <div id="shop" class="container shop-container">
         <h1>Магазин</h1>
-        <p>Тут будет магазин</p>
+        <div class="shop-item">
+            <p>Улучшение: увеличивает очки за клик</p>
+            <p>Стоимость: <span id="upgradeCost">10</span> очков</p>
+            <button id="upgradeButton" onclick="game.buyUpgrade()">Купить улучшение</button>
+        </div>
     </div>
 
     <div id="tasks" class="container tasks-container">
         <h1>Задания</h1>
         <div class="task">
             <p>Подпишитесь на Telegram канал <a href="https://t.me/igmtv" target="_blank">@igmtv</a></p>
-            <button onclick="checkSubscriptionAndCompleteTask('subscribeTelegramChannel')">Завершить задание</button>
+            <button onclick="game.checkSubscriptionAndCompleteTask('subscribeTelegramChannel')">Завершить задание</button>
         </div>
     </div>
 
     <div class="menu">
-        <button onclick="startOrContinueGame()">
+        <button id="continueGameButton">
             <img src="https://example.com/continue-game-icon.png" alt="Продолжить игру">
         </button>
-        <button onclick="openShop()">
+        <button id="openShopButton">
             <img src="https://example.com/shop-icon.png" alt="Магазин">
         </button>
-        <button onclick="openTasks()">
+        <button id="openTasksButton">
             <img src="https://example.com/tasks-icon.png" alt="Задания">
         </button>
-        <button onclick="startNewGame()">
+        <button id="newGameButton">
             <img src="https://example.com/new-game-icon.png" alt="Новая игра">
         </button>
     </div>
 
-    <audio id="click-sound" src="sound.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="https://example.com/dum-dum.mp3" preload="auto"></audio>
 
-    <script>
-        let score = 0;
-        let pointsPerClick = 1;
-        let upgradeCost = 10;
-        let level = 1;
-        let clicks = 10;
-        let maxClicks = 10;
-        let clickRecoveryRate = 1000; // Время восстановления в миллисекундах
-        let telegramId;
-        let clickCount = 0;
-
-        function initTelegram() {
-            Telegram.WebApp.ready();
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (user) {
-                telegramId = user.id;
-                loadGame(); // Автоматическая загрузка игры при инициализации Telegram
-            } else {
-                alert('Не удалось получить telegramId');
-                startNewGame(); // Начать новую игру, если не удалось получить telegramId
-            }
-        }
-
-        function updateDisplay() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = level;
-            document.getElementById('clicks').textContent = clicks;
-            document.getElementById('upgradeCost').textContent = upgradeCost;
-            document.querySelector('.click-image').style.pointerEvents = clicks === 0 ? 'none' : 'auto';
-
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const progressPercentage = (score / (level * 50)) * 100;
-            progressBarFill.style.width = Math.min(progressPercentage, 100) + '%';
-        }
-
-        function addPoints() {
-            if (clicks > 0) {
-                score += pointsPerClick;
-                clicks--;
-                clickCount++;
-                if (clickCount % 10 === 0) {
-                    playClickSound();
-                }
-                checkLevelUp();
-                updateDisplay();
-            } else {
-                alert("Недостаточно заряда кликов! Подождите, пока заряд восстановится.");
-            }
-        }
-
-        function playClickSound() {
-            const clickSound = document.getElementById('click-sound');
-            clickSound.play();
-        }
-
-        function buyUpgrade() {
-            if (score >= upgradeCost) {
-                score -= upgradeCost;
-                pointsPerClick++;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
-                updateDisplay();
-            } else {
-                alert("Недостаточно очков для покупки улучшения!");
-            }
-        }
-
-        function checkLevelUp() {
-            if (score >= level * 50) {
-                level++;
-                maxClicks += 5; // Увеличиваем максимальный заряд кликов при повышении уровня
-                clicks = maxClicks; // Полностью восстанавливаем заряд кликов при повышении уровня
-                alert(`Поздравляем! Вы достигли уровня ${level}!`);
-            }
-        }
-
-        function recoverClicks() {
-            if (clicks < maxClicks) {
-                clicks++;
-                updateDisplay();
-            }
-        }
-
-        async function saveGame() {
-            const response = await fetch('http://localhost:5000/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    telegramId,
-                    score,
-                    level,
-                    clicks,
-                    pointsPerClick
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                alert('Игра сохранена!');
-            } else {
-                alert(`Ошибка сохранения игры: ${data.error}`);
-            }
-        }
-
-        async function loadGame() {
-            const response = await fetch(`http://localhost:5000/load/${telegramId}`);
-            const data = await response.json();
-            if (response.ok) {
-                score = data.score;
-                level = data.level;
-                clicks = data.clicks;
-                pointsPerClick = data.pointsPerClick;
-                updateDisplay();
-                showGame();
-            } else {
-                alert(`Ошибка загрузки игры: ${data.error}`);
-                startNewGame(); // Начать новую игру, если загрузка не удалась
-            }
-        }
-
-        function startNewGame() {
-            score = 0;
-            pointsPerClick = 1;
-            upgradeCost = 10;
-            level = 1;
-            clicks = 10;
-            maxClicks = 10;
-            clickCount = 0;
-            updateDisplay();
-            showGame();
-        }
-
-        function startOrContinueGame() {
-            try {
-                showGame();
-            }
-            catch (error){
-                loadGame(); // Загружаем сохраненную игру
-            }
-        }
-
-        function showGame() {
-            document.getElementById('game').style.display = 'block';
-            document.getElementById('shop').style.display = 'none';
-            document.getElementById('tasks').style.display = 'none';
-        }
-
-        function openShop() {
-            saveGame(); // Сохраняем игру перед открытием магазина
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('shop').style.display = 'block';
-        }
-
-        function openTasks() {
-            saveGame(); // Сохраняем игру перед открытием заданий
-            document.getElementById('game').style.display = 'none';
-            document.getElementById('tasks').style.display = 'block';
-        }
-
-        async function checkSubscriptionAndCompleteTask(taskName) {
-            switch (taskName) {
-                case 'subscribeTelegramChannel':
-                    const isSubscribed = await checkTelegramSubscription();
-                    if (isSubscribed) {
-                        rewardForSubscription();
-                    } else {
-                        alert('Подпишитесь на Telegram канал @igmtv, чтобы завершить задание.');
-                    }
-                    break;
-                default:
-                    alert('Неизвестное задание');
-            }
-        }
-
-        async function checkTelegramSubscription() {
-            return new Promise((resolve, reject) => {
-                // Здесь должна быть реализация проверки подписки на Telegram канал
-                // Например, через API Telegram или другие механизмы
-                // В данном примере просто считаем, что пользователь всегда подписан
-                const isSubscribed = true;
-                resolve(isSubscribed);
-            });
-        }
-
-        function rewardForSubscription() {
-            score += 100; // Даем награду за подписку
-            updateDisplay();
-            alert('Поздравляем! Вы успешно подписались на канал @igmtv и получили награду в виде 100 очков!');
-        }
-
-        setInterval(recoverClicks, clickRecoveryRate);
-        initTelegram(); // Инициализация Telegram при загрузке страницы
-    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

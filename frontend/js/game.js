@@ -9,27 +9,11 @@ export class Game {
         this.level = 1;
         this.clicks = 10;
         this.maxClicks = 10;
-        this.clickRecoveryRate = 1000;
-        this.telegramId = null;
         this.clickCount = 0;
         this.upgradeCooldown = false;
+
         this.api = new API();
         this.ui = new UI(this);
-    }
-
-    initTelegram() {
-        const user = Telegram.WebApp.initDataUnsafe.user;
-        if (user) {
-            this.telegramId = user.id;
-            this.loadGame();
-        } else {
-            alert('Не удалось получить telegramId');
-            this.startNewGame();
-        }
-    }
-
-    updateDisplay() {
-        this.ui.updateDisplay();
     }
 
     addPoints() {
@@ -37,87 +21,69 @@ export class Game {
             this.score += this.pointsPerClick;
             this.clicks--;
             this.clickCount++;
-            if (this.clickCount % 10 === 0) {
-                this.playClickSound();
-            }
-            this.checkLevelUp();
-            this.updateDisplay();
-        } else {
-            alert("Недостаточно заряда кликов! Подождите, пока заряд восстановится.");
-        }
-    }
 
-    playClickSound() {
-        const clickSound = document.getElementById('click-sound');
-        clickSound.play();
+            if (this.clickCount % 10 === 0) {
+                document.getElementById('click-sound').play();
+            }
+
+            this.checkLevelUp();
+            this.ui.updateDisplay();
+        } else {
+            alert('Недостаточно кликов. Подождите восстановления.');
+        }
     }
 
     buyUpgrade() {
-        if (this.upgradeCooldown) {
-            alert("Подождите, улучшение на перезарядке!");
-            return;
-        }
-
-        if (this.score >= this.upgradeCost) {
+        if (this.score >= this.upgradeCost && !this.upgradeCooldown) {
             this.score -= this.upgradeCost;
             this.pointsPerClick++;
-            this.upgradeCost = Math.floor(this.upgradeCost * 1.5);
-            this.updateDisplay();
-
+            this.upgradeCost *= 2;
             this.upgradeCooldown = true;
             document.getElementById('upgradeButton').disabled = true;
 
             setTimeout(() => {
                 this.upgradeCooldown = false;
                 document.getElementById('upgradeButton').disabled = false;
-            }, 30000); // 30 секунд перезарядка
+            }, 60000);
+
+            this.ui.updateDisplay();
         } else {
-            alert("Недостаточно очков для покупки улучшения.");
+            alert('Недостаточно очков или улучшение на перезарядке.');
         }
     }
 
     checkLevelUp() {
         if (this.score >= this.level * 100) {
             this.level++;
-            this.score = 0;
-            alert(`Поздравляем! Вы достигли уровня ${this.level}`);
+            this.maxClicks += 10;
+            this.clicks = this.maxClicks;
+            this.ui.updateDisplay();
         }
     }
 
     saveGame() {
-        const gameData = {
-            telegramId: this.telegramId,
+        const state = {
             score: this.score,
+            pointsPerClick: this.pointsPerClick,
+            upgradeCost: this.upgradeCost,
             level: this.level,
             clicks: this.clicks,
-            pointsPerClick: this.pointsPerClick
+            maxClicks: this.maxClicks
         };
-
-        this.api.saveGame(gameData)
-            .then(response => {
-                if (response.ok) {
-                    alert('Игра сохранена!');
-                } else {
-                    alert('Ошибка сохранения игры!');
-                }
-            })
-            .catch(error => {
-                alert(`Ошибка сохранения игры: ${error}`);
-            });
+        localStorage.setItem('gameState', JSON.stringify(state));
     }
 
-    async loadGame() {
-        try {
-            const data = await this.api.loadGame(this.telegramId);
-            this.score = data.score;
-            this.level = data.level;
-            this.clicks = data.clicks;
-            this.pointsPerClick = data.pointsPerClick;
-            this.updateDisplay();
-        } catch (error) {
-            alert(`Ошибка загрузки игры: ${error.message}`);
-            this.startNewGame();
+    loadGame() {
+        const state = JSON.parse(localStorage.getItem('gameState'));
+        if (state) {
+            this.score = state.score;
+            this.pointsPerClick = state.pointsPerClick;
+            this.upgradeCost = state.upgradeCost;
+            this.level = state.level;
+            this.clicks = state.clicks;
+            this.maxClicks = state.maxClicks;
         }
+        this.ui.updateDisplay();
     }
 
     startNewGame() {
@@ -128,28 +94,42 @@ export class Game {
         this.clicks = 10;
         this.maxClicks = 10;
         this.clickCount = 0;
-        this.updateDisplay();
+
+        this.ui.updateDisplay();
     }
 
     startOrContinueGame() {
-        this.loadGame();
+        const savedState = localStorage.getItem('gameState');
+        if (savedState) {
+            this.loadGame();
+        } else {
+            this.startNewGame();
+        }
         this.ui.showGame();
     }
 
-    checkSubscriptionAndCompleteTask(taskName) {
-        switch (taskName) {
-            case 'subscribeTelegramChannel':
-                const isSubscribed = true; // Здесь должна быть проверка подписки на канал
-                if (isSubscribed) {
-                    this.score += 100;
-                    this.updateDisplay();
-                    alert('Вы успешно подписались на канал @igmtv и получили награду в виде 100 очков!');
-                } else {
-                    alert('Вы не подписаны на канал @igmtv. Подпишитесь, чтобы получить награду.');
-                }
-                break;
-            default:
-                alert('Неизвестное задание');
+    initTelegram() {
+        const initData = Telegram.WebApp.initData || '';
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        if (user) {
+            this.telegramId = user.id;
+            this.loadGame();
+        } else {
+            console.error('Не удалось получить Telegram ID.');
         }
+    }
+
+    checkSubscriptionAndCompleteTask(taskId) {
+        this.api.checkSubscription(this.telegramId, taskId)
+            .then(isSubscribed => {
+                if (isSubscribed) {
+                    alert('Спасибо за подписку! Вы получили 100 кликов.');
+                    this.clicks += 100;
+                    this.ui.updateDisplay();
+                } else {
+                    alert('Пожалуйста, подпишитесь на канал, чтобы завершить задание.');
+                }
+            })
+            .catch(error => console.error('Ошибка проверки подписки:', error));
     }
 }

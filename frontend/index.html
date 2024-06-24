@@ -12,7 +12,10 @@
         <h1>Кликер игра</h1>
         <p class="score-user">Очки: <span id="score">0</span></p>
         <p class="level-user">Уровень: <span id="level">1</span></p>
-        <p>Заряд кликов: <span id="clicks">10</span></p>
+        <div class="energy-bar">
+            <img src="https://example.com/energy-icon.png" alt="Энергия" class="energy-icon">
+            <span id="clicks">10</span> / <span id="maxClicks">10</span>
+        </div>
         <div class="progress-bar">
             <div class="progress-bar-fill" id="progress-bar-fill"></div>
             <div class="progress-bar-text" id="progress-bar-text"></div>
