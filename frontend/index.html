@@ -10,16 +10,21 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const tg = Telegram.WebApp;
-            tg.ready(); // Убедитесь, что WebApp инициализирован
 
-            // Получение и проверка данных
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                console.log('User ID:', tg.initDataUnsafe.user.id);
-                console.log('User Name:', tg.initDataUnsafe.user.first_name);
-                // Другие данные можно получить здесь
-            } else {
-                console.log('Telegram.WebApp.initDataUnsafe is not available');
-            }
+            tg.ready(() => {
+                // Добавьте логирование для отладки
+                console.log('Telegram WebApp is ready');
+                console.log('initDataUnsafe:', tg.initDataUnsafe);
+
+                // Получение и проверка данных
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    console.log('User ID:', tg.initDataUnsafe.user.id);
+                    console.log('User Name:', tg.initDataUnsafe.user.first_name);
+                    // Другие данные можно получить здесь
+                } else {
+                    console.log('Telegram.WebApp.initDataUnsafe is not available');
+                }
+            });
         });
     </script>
 </body>
