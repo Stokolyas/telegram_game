@@ -6,7 +6,6 @@
     <title>Кликер игра</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
 </head>
 <body>
     <div id="game" class="container game-container">
@@ -25,22 +24,6 @@
             <div class="click-image" onclick="game.addPoints()"></div>
         </div>
         <button class="save-btn" onclick="game.saveGame()">Сохранить игру</button>
-    
-        <div class="menu">
-            <button id="continueGameButton">
-                <img src="assets/continue-game-icon.svg" alt="Продолжить игру">
-            </button>
-            <button id="openShopButton">
-                <img src="assets/shop-icon.svg" alt="Магазин">
-            </button>
-            <button id="openTasksButton">
-                <img src="assets/tasks-icon.svg" alt="Задания">
-            </button>
-            <button id="newGameButton">
-                <img src="assets/new-game-icon.svg" alt="Новая игра">
-            </button>
-        </div>
-    
     </div>
 
     <div id="shop" class="container shop-container">
@@ -60,7 +43,20 @@
         </div>
     </div>
 
-    
+    <div class="menu">
+        <button id="continueGameButton">
+            <img src="assets/continue-game-icon.svg" alt="Продолжить игру">
+        </button>
+        <button id="openShopButton">
+            <img src="assets/shop-icon.svg" alt="Магазин">
+        </button>
+        <button id="openTasksButton">
+            <img src="assets/tasks-icon.svg" alt="Задания">
+        </button>
+        <button id="newGameButton">
+            <img src="assets/new-game-icon.svg" alt="Новая игра">
+        </button>
+    </div>
 
     <audio id="click-sound" src="assets/dum-dum.mp3" preload="auto"></audio>
 
@@ -68,6 +64,6 @@
         Не удалось инициализировать Telegram WebApp.
     </div>
 
-    <script type="module" src="js/main.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
