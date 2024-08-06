@@ -15,6 +15,11 @@
             // Ваш код для работы с Telegram.WebApp
             console.log('Telegram Web App initialized');
         });
+        if (window.Telegram && window.Telegram.WebApp) {
+    console.log('Telegram.WebApp is available');
+} else {
+    console.log('Telegram.WebApp is not available');
+}
     </script>
 </body>
 </html>

@@ -2,12 +2,6 @@ import { Game } from './game.js';
 
 const game = new Game();
 
-if (window.Telegram && window.Telegram.WebApp) {
-    console.log('Telegram.WebApp is available');
-} else {
-    console.log('Telegram.WebApp is not available');
-}
-
 
 document.getElementById('continueGameButton').addEventListener('click', () => {
     game.startOrContinueGame();
