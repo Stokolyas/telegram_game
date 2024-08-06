@@ -36,9 +36,10 @@ function initTelegram() {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
         console.log(Telegram);
         console.log(Telegram.WebApp)
-        console.log(Telegram.WebApp.initDataUnsafe.user)
+        
         Telegram.WebApp.ready();
         const initData = Telegram.WebApp.initData || '';
+        console.log(Telegram.WebApp.initDataUnsafe.user)
 
         const user = Telegram.WebApp.initDataUnsafe.user;
         if (user) {
