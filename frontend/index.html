@@ -1,69 +1,99 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кликер игра</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Telegram Web App</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .status-bar {
+            width: 80%;
+            height: 30px;
+            background-color: lightgrey;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .status-bar-fill {
+            height: 100%;
+            background-color: green;
+            width: 0;
+        }
+        .status-bar-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 5px;
+        }
+        #click-count {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 <body>
-    <div id="game" class="container game-container">
-        <h1>Кликер игра</h1>
-        <p>Очки: <span id="score">0</span></p>
-        <p>Уровень: <span id="level">1</span></p>
-        <div class="energy-bar">
-            <img src="assets/energy-icon.png" alt="Энергия" class="energy-icon">
-            <span id="clicks">10</span> / <span id="maxClicks">10</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
-            <div class="progress-bar-text" id="progress-bar-text">0 / 100</div>
-        </div>
-        <div class="centered">
-            <div class="click-image" onclick="game.addPoints()"></div>
-        </div>
-        <button class="save-btn" onclick="game.saveGame()">Сохранить игру</button>
+    <div class="status-bar">
+        <div class="status-bar-fill" id="status-bar-fill"></div>
+        <div class="status-bar-text" id="status-bar-text">0 / 10</div>
     </div>
+    <img src="https://example.com/stone_head.png" alt="Stone Head" id="click-button" style="cursor: pointer;">
+    <div id="click-count">Клики: 0</div>
+    <div id="energy-status">Энергия: 0 / 10</div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
 
-    <div id="shop" class="container shop-container">
-        <h1>Магазин</h1>
-        <div class="shop-item">
-            <p>Улучшение: увеличивает очки за клик</p>
-            <p>Стоимость: <span id="upgradeCost">10</span> очков</p>
-            <button id="upgradeButton" onclick="game.buyUpgrade()">Купить улучшение</button>
-        </div>
-    </div>
+        let clickCount = 0;
+        let energy = 10;
+        const maxEnergy = 10;
 
-    <div id="tasks" class="container tasks-container">
-        <h1>Задания</h1>
-        <div class="task">
-            <p>Подпишитесь на Telegram канал <a href="https://t.me/igmtv" target="_blank">@igmtv</a></p>
-            <button onclick="game.checkSubscriptionAndCompleteTask('subscribeTelegramChannel')">Завершить задание</button>
-        </div>
-    </div>
+        const statusBarFill = document.getElementById('status-bar-fill');
+        const statusBarText = document.getElementById('status-bar-text');
+        const clickButton = document.getElementById('click-button');
+        const clickCountDiv = document.getElementById('click-count');
+        const energyStatus = document.getElementById('energy-status');
 
-    <div class="menu">
-        <button id="continueGameButton">
-            <img src="assets/continue-game-icon.svg" alt="Продолжить игру">
-        </button>
-        <button id="openShopButton">
-            <img src="assets/shop-icon.svg" alt="Магазин">
-        </button>
-        <button id="openTasksButton">
-            <img src="assets/tasks-icon.svg" alt="Задания">
-        </button>
-        <button id="newGameButton">
-            <img src="assets/new-game-icon.svg" alt="Новая игра">
-        </button>
-    </div>
+        function updateStatusBar() {
+            const percentage = (clickCount % 10) * 10;
+            statusBarFill.style.width = percentage + '%';
+            statusBarText.textContent = `${clickCount % 10} / 10`;
+        }
 
-    <audio id="click-sound" src="assets/dum-dum.mp3" preload="auto"></audio>
+        function updateClickCount() {
+            clickCountDiv.textContent = `Клики: ${clickCount}`;
+        }
 
-    <div id="telegram-error" style="display: none; color: red; text-align: center;">
-        Не удалось инициализировать Telegram WebApp.
-    </div>
+        function updateEnergyStatus() {
+            energyStatus.textContent = `Энергия: ${energy} / ${maxEnergy}`;
+        }
 
-    <script type="module" src="js/main.js"></script>
+        function handleButtonClick() {
+            if (energy > 0) {
+                clickCount++;
+                energy--;
+                updateClickCount();
+                updateEnergyStatus();
+                updateStatusBar();
+
+                if (clickCount % 10 === 0) {
+                    new Audio('https://example.com/dum_dum.mp3').play();
+                }
+            } else {
+                alert('Не хватает энергии!');
+            }
+        }
+
+        clickButton.addEventListener('click', handleButtonClick);
+
+        updateStatusBar();
+        updateClickCount();
+        updateEnergyStatus();
+    </script>
 </body>
 </html>
