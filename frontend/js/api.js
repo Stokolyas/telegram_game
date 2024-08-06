@@ -1,19 +1,12 @@
 export class API {
-    saveGame(gameData) {
-        return fetch(`http://localhost:5000/save`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(gameData),
+    checkSubscription(telegramId, taskId) {
+        // Пример вызова API для проверки подписки
+        return new Promise((resolve, reject) => {
+            // Замените на ваш реальный API-запрос
+            setTimeout(() => {
+                // Мокаем проверку подписки
+                resolve(true); // Предполагаем, что пользователь подписан
+            }, 1000);
         });
-    }
-
-    async loadGame(telegramId) {
-        const response = await fetch(`http://localhost:5000/load/${telegramId}`);
-        if (!response.ok) {
-            throw new Error('Ошибка загрузки игры');
-        }
-        return response.json();
     }
 }

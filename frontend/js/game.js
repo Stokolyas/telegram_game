@@ -10,10 +10,12 @@ export class Game {
         this.clicks = 10;
         this.maxClicks = 10;
         this.clickCount = 0;
-        this.upgradeCooldown = false;
-
-        this.api = new API();
+        this.upgradeTimeout = null;
         this.ui = new UI(this);
+        this.api = new API();
+
+        this.ui.updateDisplay();
+        this.startOrContinueGame();
     }
 
     addPoints() {
@@ -21,32 +23,29 @@ export class Game {
             this.score += this.pointsPerClick;
             this.clicks--;
             this.clickCount++;
+            this.checkLevelUp();
+            this.ui.updateDisplay();
 
             if (this.clickCount % 10 === 0) {
                 document.getElementById('click-sound').play();
             }
-
-            this.checkLevelUp();
-            this.ui.updateDisplay();
         } else {
-            alert('Недостаточно кликов. Подождите восстановления.');
+            alert('Недостаточно кликов! Подождите, пока клики восстановятся.');
         }
     }
 
     buyUpgrade() {
-        if (this.score >= this.upgradeCost && !this.upgradeCooldown) {
+        if (this.score >= this.upgradeCost && this.upgradeTimeout === null) {
             this.score -= this.upgradeCost;
             this.pointsPerClick++;
             this.upgradeCost *= 2;
-            this.upgradeCooldown = true;
-            document.getElementById('upgradeButton').disabled = true;
+            this.ui.updateDisplay();
 
-            setTimeout(() => {
-                this.upgradeCooldown = false;
+            document.getElementById('upgradeButton').disabled = true;
+            this.upgradeTimeout = setTimeout(() => {
+                this.upgradeTimeout = null;
                 document.getElementById('upgradeButton').disabled = false;
             }, 60000);
-
-            this.ui.updateDisplay();
         } else {
             alert('Недостаточно очков или улучшение на перезарядке.');
         }
