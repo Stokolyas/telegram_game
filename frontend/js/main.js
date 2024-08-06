@@ -34,9 +34,7 @@ document.getElementById('newGameButton').addEventListener('click', () => {
 // Инициализация Telegram WebApp
 function initTelegram() {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        console.log(Telegram);
-        console.log(Telegram.WebApp)
-        
+
         Telegram.WebApp.ready();
         const initData = Telegram.WebApp.initData || '';
         console.log(Telegram.WebApp.initDataUnsafe.user)
@@ -55,6 +53,6 @@ function initTelegram() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
     initTelegram();
 });
