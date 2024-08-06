@@ -19,8 +19,34 @@
                 console.log('Telegram.WebApp не определен');
                 return;
             }
+            document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event triggered');
+    const tg = Telegram.WebApp;
 
-            tg.ready(() => {
+    if (!tg) {
+        console.log('Telegram.WebApp не определен');
+        return;
+    }
+
+    // Добавляем небольшой таймаут перед вызовом tg.ready
+    setTimeout(() => {
+        tg.ready(function() {
+            console.log('Telegram WebApp is ready');
+            console.log('initDataUnsafe:', tg.initDataUnsafe);
+
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                console.log('User ID:', tg.initDataUnsafe.user.id);
+                console.log('User Name:', tg.initDataUnsafe.user.first_name);
+            } else {
+                console.log('Telegram.WebApp.initDataUnsafe is not available or user data is missing');
+            }
+        });
+
+        console.log('tg.ready вызван с таймаутом');
+    }, 1000); // Таймаут 1 секунда
+});
+            // Пробуем вызвать tg.ready с явной функцией
+            tg.ready(function() {
                 console.log('Telegram WebApp is ready');
                 console.log('initDataUnsafe:', tg.initDataUnsafe);
 
@@ -32,11 +58,7 @@
                 }
             });
 
-            setTimeout(() => {
-                if (!tg.initDataUnsafe) {
-                    console.log('Telegram.WebApp.initDataUnsafe все еще не доступен');
-                }
-            }, 5000); // 5 секунд ожидания для проверки доступности данных
+            console.log('tg.ready вызван');
         });
     </script>
 </body>
