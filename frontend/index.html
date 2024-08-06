@@ -4,27 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        console.log('Загрузка Telegram WebApp JS...');
+    </script>
+    <script src="https://telegram.org/js/telegram-web-app.js" onload="console.log('Telegram WebApp JS загружен')" onerror="console.log('Ошибка загрузки Telegram WebApp JS')"></script>
 </head>
 <body>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded event triggered');
             const tg = Telegram.WebApp;
 
+            if (!tg) {
+                console.log('Telegram.WebApp не определен');
+                return;
+            }
+
             tg.ready(() => {
-                // Добавьте логирование для отладки
                 console.log('Telegram WebApp is ready');
                 console.log('initDataUnsafe:', tg.initDataUnsafe);
 
-                // Получение и проверка данных
                 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                     console.log('User ID:', tg.initDataUnsafe.user.id);
                     console.log('User Name:', tg.initDataUnsafe.user.first_name);
-                    // Другие данные можно получить здесь
                 } else {
-                    console.log('Telegram.WebApp.initDataUnsafe is not available');
+                    console.log('Telegram.WebApp.initDataUnsafe is not available or user data is missing');
                 }
             });
+
+            setTimeout(() => {
+                if (!tg.initDataUnsafe) {
+                    console.log('Telegram.WebApp.initDataUnsafe все еще не доступен');
+                }
+            }, 5000); // 5 секунд ожидания для проверки доступности данных
         });
     </script>
 </body>
