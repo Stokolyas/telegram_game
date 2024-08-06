@@ -32,13 +32,18 @@ document.getElementById('newGameButton').addEventListener('click', () => {
 
 // Инициализация Telegram WebApp
 function initTelegram() {
-    const initData = Telegram.WebApp.initData || '';
-    const user = Telegram.WebApp.initDataUnsafe.user;
-    if (user) {
-        game.telegramId = user.id;
-        game.startOrContinueGame();
+    if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        const initData = Telegram.WebApp.initData || '';
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        if (user) {
+            game.telegramId = user.id;
+            game.startOrContinueGame();
+        } else {
+            console.error('Не удалось получить Telegram ID.');
+        }
     } else {
-        console.error('Не удалось получить Telegram ID.');
+        console.error('Telegram WebApp не инициализирован.');
     }
 }
 
