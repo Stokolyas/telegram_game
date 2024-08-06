@@ -5,10 +5,8 @@ export class UI {
     }
 
     initEventListeners() {
-        document.getElementById('continueGameButton').addEventListener('click', () => this.game.startOrContinueGame());
-        document.getElementById('openShopButton').addEventListener('click', () => this.openShop());
-        document.getElementById('openTasksButton').addEventListener('click', () => this.openTasks());
-        document.getElementById('newGameButton').addEventListener('click', () => this.game.startNewGame());
+        document.querySelector('.click-image').addEventListener('click', () => this.game.addPoints());
+        document.getElementById('upgradeButton').addEventListener('click', () => this.game.buyUpgrade());
     }
 
     updateDisplay() {
@@ -17,29 +15,14 @@ export class UI {
         document.getElementById('clicks').innerText = this.game.clicks;
         document.getElementById('maxClicks').innerText = this.game.maxClicks;
         document.getElementById('upgradeCost').innerText = this.game.upgradeCost;
-
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const progressBarText = document.getElementById('progress-bar-text');
-
-        const progress = (this.game.score / (this.game.level * 100)) * 100;
-        progressBarFill.style.width = `${progress}%`;
-        progressBarText.innerText = `${this.game.score} / ${this.game.level * 100}`;
+        const progress = (this.game.score % (this.game.level * 100)) / (this.game.level * 100) * 100;
+        document.getElementById('progress-bar-fill').style.width = `${progress}%`;
+        document.getElementById('progress-bar-text').innerText = `${this.game.score} / ${this.game.level * 100}`;
     }
 
     showGame() {
-        document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
-        document.getElementById('game').style.display = 'block';
-    }
-
-    openShop() {
-        this.game.saveGame();
-        document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
-        document.getElementById('shop').style.display = 'block';
-    }
-
-    openTasks() {
-        this.game.saveGame();
-        document.querySelectorAll('.container').forEach(container => container.style.display = 'none');
-        document.getElementById('tasks').style.display = 'block';
+        document.getElementById('game').style.display = 'flex';
+        document.getElementById('shop').style.display = 'none';
+        document.getElementById('tasks').style.display = 'none';
     }
 }

@@ -1,5 +1,5 @@
-import { API } from './api.js';
 import { UI } from './ui.js';
+import { API } from './api.js';
 
 export class Game {
     constructor() {
@@ -11,11 +11,10 @@ export class Game {
         this.maxClicks = 10;
         this.clickCount = 0;
         this.upgradeTimeout = null;
+        this.telegramId = null;
+
         this.ui = new UI(this);
         this.api = new API();
-
-        this.ui.updateDisplay();
-        this.startOrContinueGame();
     }
 
     addPoints() {
