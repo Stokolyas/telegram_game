@@ -33,9 +33,8 @@ document.getElementById('newGameButton').addEventListener('click', () => {
 // Инициализация Telegram WebApp
 function initTelegram() {
     if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-        window.Telegram.initData()
         window.Telegram.WebApp.ready();
-        const initData = window.Telegram.WebApp.initData() || '';
+        const initData = window.Telegram.WebApp.initData || '';
         const user = window.Telegram.WebApp.initDataUnsafe.user;
         if (user) {
             game.telegramId = user.id;
