@@ -1,69 +1,26 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кликер игра</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="game" class="container game-container">
-        <h1>Кликер игра</h1>
-        <p>Очки: <span id="score">0</span></p>
-        <p>Уровень: <span id="level">1</span></p>
-        <div class="energy-bar">
-            <img src="assets/energy-icon.png" alt="Энергия" class="energy-icon">
-            <span id="clicks">10</span> / <span id="maxClicks">10</span>
-        </div>
-        <div class="progress-bar">
-            <div class="progress-bar-fill" id="progress-bar-fill"></div>
-            <div class="progress-bar-text" id="progress-bar-text">0 / 100</div>
-        </div>
-        <div class="centered">
-            <div class="click-image" onclick="game.addPoints()"></div>
-        </div>
-        <button class="save-btn" onclick="game.saveGame()">Сохранить игру</button>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tg = window.Telegram.WebApp;
+            tg.ready(); // Убедитесь, что WebApp инициализирован
 
-    <div id="shop" class="container shop-container">
-        <h1>Магазин</h1>
-        <div class="shop-item">
-            <p>Улучшение: увеличивает очки за клик</p>
-            <p>Стоимость: <span id="upgradeCost">10</span> очков</p>
-            <button id="upgradeButton" onclick="game.buyUpgrade()">Купить улучшение</button>
-        </div>
-    </div>
-
-    <div id="tasks" class="container tasks-container">
-        <h1>Задания</h1>
-        <div class="task">
-            <p>Подпишитесь на Telegram канал <a href="https://t.me/igmtv" target="_blank">@igmtv</a></p>
-            <button onclick="game.checkSubscriptionAndCompleteTask('subscribeTelegramChannel')">Завершить задание</button>
-        </div>
-    </div>
-
-    <div class="menu">
-        <button id="continueGameButton">
-            <img src="assets/continue-game-icon.svg" alt="Продолжить игру">
-        </button>
-        <button id="openShopButton">
-            <img src="assets/shop-icon.svg" alt="Магазин">
-        </button>
-        <button id="openTasksButton">
-            <img src="assets/tasks-icon.svg" alt="Задания">
-        </button>
-        <button id="newGameButton">
-            <img src="assets/new-game-icon.svg" alt="Новая игра">
-        </button>
-    </div>
-
-    <audio id="click-sound" src="assets/dum-dum.mp3" preload="auto"></audio>
-
-    <div id="telegram-error" style="display: none; color: red; text-align: center;">
-        Не удалось инициализировать Telegram WebApp.
-    </div>
-
-    
+            // Получение и проверка данных
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                console.log('User ID:', tg.initDataUnsafe.user.id);
+                console.log('User Name:', tg.initDataUnsafe.user.first_name);
+                // Другие данные можно получить здесь
+            } else {
+                console.log('Telegram.WebApp.initDataUnsafe is not available');
+            }
+        });
+    </script>
 </body>
 </html>
