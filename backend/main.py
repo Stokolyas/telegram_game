@@ -2,7 +2,7 @@ import logging
 import sqlite3
 from uuid import uuid4
 from creds import BOT_TOKEN, BOT_USERNAME, WEBAPP_URL
-from telegram import InlineQueryResultGame, Update
+from telegram import InlineQueryResultGame, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, InlineQueryHandler, CallbackQueryHandler, TypeHandler, CallbackContext
 from customwebhook import CustomContext, WebhookUpdate
 
@@ -40,8 +40,11 @@ async def callback_query(update: Update, context: CallbackContext) -> None:
 
 async def start(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    await update.message.reply_text('Добро пожаловать в нашу игру! Нажмите кнопку ниже, чтобы начать играть.')
-    await context.bot.send_game(chat_id, game_short_name=BOT_USERNAME)
+    keyboard = [
+        [InlineKeyboardButton("Open WebApp", web_app={'url': WEBAPP_URL})]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text('Добро пожаловать в нашу игру! Нажмите кнопку ниже, чтобы начать играть.', reply_markup=reply_markup)
 
 async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
     logger.info('Webhook update received')
